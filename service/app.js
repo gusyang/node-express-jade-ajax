@@ -38,6 +38,11 @@ app.use('/users', users);
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
+    var db = req.db;
+    db.collection('bad404request').insert({badrequest:req.url,path:__dirname},function(err,result){
+        //res.send(err === null?{msg:''}:{msg:err});
+        console.log("err="+err + "\nresule"+result);
+    });
     next(err);
 });
 

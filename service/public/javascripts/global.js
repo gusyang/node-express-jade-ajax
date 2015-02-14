@@ -6,20 +6,17 @@
 // Userlist data array for filling in info box
 var userListData = [];
 
-// DOM Ready =============================================================
+//for jquery, after DOM reasy
 $(document).ready(function() {
-
-    // Populate the user table on initial page load
+    // get user list
     populateTable();
 
     // Username link click
     $('#userlist table tbody').on('click', 'td a.linkshowuser', showUserInfo);
-
     // Add User button click
     $('#btnAddUser').on('click', addUser);
-
+    //Delete user
     $('#userlist table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
-
 });
 
 // Functions =============================================================
@@ -66,15 +63,21 @@ function showUserInfo(event){
 // Add User
 function addUser(event) {
     event.preventDefault();
-
     // Super basic validation - increase errorCount variable if any fields are blank
-    var errorCount = 0;
+    var errorMsg = '';
     $('#addUser input').each(function(index, val) {
-        if($(this).val() === '') { errorCount++; }
+        if($(this).val() === '') {
+            errorMsg += "\nPlease input "+$(this).attr('placeholder');
+        }
+        //check email
+        //console.log($(this).attr('id')==='inputUserEmail');
+        if($(this).attr('id') === 'inputUserEmail' && !isEmail($(this).val)){
+            errorMsg += 'Invalid Email!'
+        }
     });
 
-    // Check and make sure errorCount's still at zero
-    if(errorCount === 0) {
+    // Check if have errors
+    if(errorMsg === '') {
 
         // If it is, compile all user info into one object
         var newUser = {
@@ -85,7 +88,6 @@ function addUser(event) {
             'location': $('#addUser fieldset input#inputUserLocation').val(),
             'gender': $('#addUser fieldset input#inputUserGender').val()
         }
-
         // Use AJAX to post the object to our adduser service
         $.ajax({
             type: 'POST',
@@ -93,28 +95,22 @@ function addUser(event) {
             url: '/users/adduser',
             dataType: 'JSON'
         }).done(function( response ) {
-
             // Check for successful (blank) response
             if (response.msg === '') {
-
                 // Clear the form inputs
                 $('#addUser fieldset input').val('');
-
                 // Update the table
                 populateTable();
-
             }
             else {
-
                 // If something goes wrong, alert the error message that our service returned
                 alert('Error: ' + response.msg);
-
             }
         });
     }
     else {
-        // If errorCount is more than 0, error out
-        alert('Please fill in all fields');
+        // If has error
+        alert(errorMsg);
         return false;
     }
 };
@@ -139,5 +135,9 @@ function deleteUser(event) {
     }else{
         return false; //doesnt confirm to delete
     }
-
 };
+
+function isEmail(email) {
+    var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return regex.test(email);
+}

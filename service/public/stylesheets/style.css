@@ -3,6 +3,24 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+a {  color: #00B7FF;}
+tr td{border: solid #000000 1px;}
+
+#userInfo{
+    float:right;
+    width: 50%;;
+}
+
+#userlist{
+    float: left;
+    width:50%;
+}
+
+thead{
+    background-color: lightgray;
+    border:1px;
+}
+
+#addUser{
+    clear: both;
 }
