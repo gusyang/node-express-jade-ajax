@@ -28,5 +28,13 @@ router.delete('/deleteuser/:id',function(req,res){
     });
 });
 
+router.post('/updateuser/:id',function(req,res){
+   var db = req.db;
+    var id = req.params.id;
+    db.collection('userlist').updateById(id,req.body,function(err,result){
+        res.send(result === 1?{msg:''}:{msg:'err:'+err +' result:'+result});
+    });
+});
+
 
 module.exports = router;

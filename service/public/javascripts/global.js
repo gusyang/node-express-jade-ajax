@@ -6,7 +6,7 @@
 // Userlist data array for filling in info box
 var userListData = [];
 
-//for jquery, after DOM reasy
+//for jquery, after DOM ready
 $(document).ready(function() {
     // get user list
     populateTable();
@@ -17,6 +17,11 @@ $(document).ready(function() {
     $('#btnAddUser').on('click', addUser);
     //Delete user
     $('#userlist table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
+
+    $('#userlist table tbody').on('click', 'td a.linkupdateuser', getUserInfo);
+    $('#btnUpdateUses').on('click',addUser);
+
+
 });
 
 // Functions =============================================================
@@ -33,6 +38,7 @@ function populateTable() {
             tableContent += '<td><a href="#" class="linkshowuser" rel="' + this.username + '">' + this.username + '</a></td>';
             tableContent += '<td>' + this.email + '</td>';
             tableContent += '<td><a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></td>';
+            tableContent += '<td><a href="#" class="linkupdateuser" rel="' + this._id +'">update</a></td>';
             tableContent += '</tr>';
         });
 
@@ -63,22 +69,26 @@ function showUserInfo(event){
 // Add User
 function addUser(event) {
     event.preventDefault();
-    // Super basic validation - increase errorCount variable if any fields are blank
-    var errorMsg = '';
+    // basic validation - increase errorCount variable if any fields are blank
+    var errorMsg = '',inputvalue,inputid;
     $('#addUser input').each(function(index, val) {
-        if($(this).val() === '') {
+        inputvalue = $(this).val();
+        inputid=$(this).attr('id');
+        if(inputvalue === '') {
             errorMsg += "\nPlease input "+$(this).attr('placeholder');
         }
         //check email
         //console.log($(this).attr('id')==='inputUserEmail');
-        if($(this).attr('id') === 'inputUserEmail' && !isEmail($(this).val)){
+        if(inputid === 'inputUserEmail' && !isEmail(inputvalue)){
             errorMsg += 'Invalid Email!'
         }
     });
 
+    //if exist _id, update user
+    var _id = $('#hdid').val();
+    var posturl = _id==='0'?'/users/adduser':'/users/updateuser/'+_id;
     // Check if have errors
     if(errorMsg === '') {
-
         // If it is, compile all user info into one object
         var newUser = {
             'username': $('#addUser fieldset input#inputUserName').val(),
@@ -92,13 +102,15 @@ function addUser(event) {
         $.ajax({
             type: 'POST',
             data: newUser,
-            url: '/users/adduser',
+            url:  posturl ,
             dataType: 'JSON'
         }).done(function( response ) {
             // Check for successful (blank) response
             if (response.msg === '') {
                 // Clear the form inputs
                 $('#addUser fieldset input').val('');
+
+                $('#btnAddUser').css('display','block');
                 // Update the table
                 populateTable();
             }
@@ -140,4 +152,21 @@ function deleteUser(event) {
 function isEmail(email) {
     var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     return regex.test(email);
-}
+};
+
+function getUserInfo(event){
+    event.preventDefault();
+    //hidden add user
+    $('#btnAddUser').css('display','none');
+    var id = $(this).attr('rel');
+    var arPosition = userListData.map(function(Item) {return Item._id; }).indexOf(id);
+    var data = userListData[arPosition];
+    $('#inputUserName').val(data.username) ;
+    $('#inputUserEmail').val(data.email);
+    $('#inputUserFullname').val(data.fullname);
+    $('#inputUserAge').val(data.age);
+    $('#inputUserLocation').val(data.location);
+    $('#inputUserGender').val(data.gender);
+    $('#hdid').val(id);
+};
+

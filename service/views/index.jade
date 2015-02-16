@@ -26,19 +26,20 @@ block content
         // /USER INFO
 
         //User List
-        h2 User List
         #userlist
+            h2 User List
             table
                 thead
                     th UserName
                     th Email
                     th Delete?
+                    th Update
                 tbody
         // /User List
 
         // ADD USER
-        h2 Add User
         #addUser
+            h2 Add User
             fieldset
                 input#inputUserName(type='text', placeholder='Username')
                 input#inputUserEmail(type='text', placeholder='Email')
@@ -49,6 +50,8 @@ block content
                 input#inputUserLocation(type='text', placeholder='Location')
                 input#inputUserGender(type='text', placeholder='gender')
                 br
+                input#hdid(type='hidden',value='0')
                 button#btnAddUser Add User
+                button#btnUpdateUses Update
         // /ADD USER
       // /wrapper
